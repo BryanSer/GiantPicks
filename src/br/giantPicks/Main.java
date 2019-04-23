@@ -198,7 +198,6 @@ public class Main extends JavaPlugin implements Listener {
                             .map(s -> s + PREFIX)
                             .collect(Collectors.toList())
             );
-            lore.add(t + PREFIX);
             edit |= t.hashCode() != hash;
             nc.put("hashCode", t.hashCode());
         }
