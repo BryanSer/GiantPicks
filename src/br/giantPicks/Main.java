@@ -134,14 +134,15 @@ public class Main extends JavaPlugin implements Listener {
             sender.sendMessage("§a[激光钻探]: 参数为挖掘深度(整数)");
             sender.sendMessage("§a[需要充能]: 无参数");
             sender.sendMessage("§a[不稳定]: 参数为爆炸概率(小数) 1为100%爆炸");
-            sender.sendMessage("§a[使用次数]: 参数为使用次数(整数)");
+            sender.sendMessage("§a[使用次数]: 参数为使用次数(整数)");//
+            sender.sendMessage("§a[立方挖掘]: 参数: width(整数) height(整数) deep(整数)");
             return true;
         }
         if (args[0].equalsIgnoreCase("add") && args.length >= 2 && sender instanceof Player) {
             Player p = (Player) sender;
             String name = args[1];
             ItemStack is = p.getInventory().getItemInMainHand();
-            if (is == null) {
+            if (is == null || is.getType() == Material.AIR) {
                 p.sendMessage("§c你的手上毛都没有");
                 return true;
             }
@@ -209,19 +210,21 @@ public class Main extends JavaPlugin implements Listener {
         return is;
     }
 
+    public static int DUR = 0;
+
     private void dig(Block block, Player p, BlockFace bf) {
-        if (!Setting.Worlds.contains(p.getWorld().getName())) {
-            p.sendMessage("§c你不能在这个世界使用这把镐子");
-            return;
-        }
         ItemStack is = p.getInventory().getItemInMainHand();
-        if (is == null) {
+        if (is == null || is.getType() == Material.AIR) {
             return;
         }
         is = is.clone();
         NbtWrapper<?> nw = NbtFactory.fromItemTag(is);
         NbtCompound c = NbtFactory.asCompound(nw);
         if (!c.containsKey("GiantPicks")) {
+            return;
+        }
+        if (!Setting.Worlds.contains(p.getWorld().getName())) {
+            p.sendMessage("§c你不能在这个世界使用这把镐子");
             return;
         }
         NbtCompound gp = c.getCompound("GiantPicks");
@@ -259,11 +262,18 @@ public class Main extends JavaPlugin implements Listener {
         BlockFace bf = tryDig.remove(String.format("%d,%d,%d", loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
         if (bf != null && !skip.contains(evt.getPlayer().getEntityId())) {
             skip.add(evt.getPlayer().getEntityId());
+            DUR = 0;
             try {
                 dig(b, evt.getPlayer(), bf);
             } catch (Exception e) {
-                Logger.getLogger(Main.class.getName()).log(Level.WARNING, null, e);
+                e.printStackTrace();
             }
+            if (DUR > 0) {
+                ItemStack is = evt.getPlayer().getInventory().getItemInMainHand().clone();
+                is.setDurability((short) (is.getDurability() + DUR));
+                evt.getPlayer().getInventory().setItemInMainHand(is);
+            }
+
             skip.remove(evt.getPlayer().getEntityId());
         }
     }
@@ -285,6 +295,7 @@ public class Main extends JavaPlugin implements Listener {
             return;
         }
         b.breakNaturally(p.getInventory().getItemInMainHand());
+        DUR++;
     }
 
 }

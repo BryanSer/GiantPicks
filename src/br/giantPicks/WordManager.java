@@ -33,6 +33,7 @@ public class WordManager {
         Words.add(new NeedEnergy());
         Words.add(new Unstable());
         Words.add(new UseTime());
+        Words.add(new Cube());
     }
 
     public static void loadWordConfig() {
