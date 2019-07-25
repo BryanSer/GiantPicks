@@ -97,7 +97,7 @@ public class Main extends JavaPlugin implements Listener {
                             return;
                     }
                     BlockPosition pos = pc.getBlockPositionModifier().getValues().get(0);
-                    tryDig.put(String.format("%d,%d,%d", pos.getX(), pos.getY(), pos.getZ()), bf);
+                    tryDig.put(String.format("%s,%d,%d,%d", evt.getPlayer().getWorld().getName(), pos.getX(), pos.getY(), pos.getZ()), bf);
                 }
             }
         }
@@ -259,7 +259,7 @@ public class Main extends JavaPlugin implements Listener {
     public void onBreak(BlockBreakEvent evt) {
         Block b = evt.getBlock();
         Location loc = b.getLocation();
-        BlockFace bf = tryDig.remove(String.format("%d,%d,%d", loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
+        BlockFace bf = tryDig.remove(String.format("%s,%d,%d,%d", loc.getWorld().getName(), loc.getBlockX(), loc.getBlockY(), loc.getBlockZ()));
         if (bf != null && !skip.contains(evt.getPlayer().getEntityId())) {
             skip.add(evt.getPlayer().getEntityId());
             DUR = 0;
